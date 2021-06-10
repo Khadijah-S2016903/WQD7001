@@ -97,19 +97,125 @@ states_stats_q1_21["Quarter"] = "'21 Q1"
 states_stats <- rbind(states_stats_q1_20,states_stats_q2_20,states_stats_q3_20,
                       states_stats_q4_20,states_stats_q1_21)
 
+rankFunction <- function(state_name,county_name,quarter,type,lvl,highlight){
+
+  
+  if(lvl == "State"){
+    if(quarter == "2020 Q1"){
+      rankdf <- states_stats_q1_20
+    } else if(quarter == "Q2"){
+      rankdf <- states_stats_q2_20
+    } else if(quarter == "Q3"){
+      rankdf <- states_stats_q3_20
+    } else if(quarter == "Q4"){
+      rankdf <- states_stats_q4_20
+    } else if(quarter == "2021 Q1"){
+      rankdf <- states_stats_q1_21
+    }
+    
+    if(highlight==TRUE){
+      rankdf <- rankdf %>% mutate( ToHighlight = ifelse( nam == state_name, "yes", "no" ))
+      if(type == "Download"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_dl_mbps_wt),y=mean_dl_mbps_wt,fill=ToHighlight)) +
+          scale_fill_manual( values = c( "yes"="tomato", "no"="gray" ), guide = FALSE )+
+          labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter")
+      } else if(type == "Upload"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_ul_mbps_wt),y=mean_ul_mbps_wt,fill=ToHighlight)) +
+          scale_fill_manual( values = c( "yes"="tomato", "no"="gray" ), guide = FALSE )+
+          labs(x="",y="Mean UL Speed (Mbps)",title="Mean UL Speed for different Quarter")
+      } else if(type == "Latency"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_lat_ms_wt),y=mean_lat_ms_wt,fill=ToHighlight)) +
+          scale_fill_manual( values = c( "yes"="tomato", "no"="gray" ), guide = FALSE )+
+          labs(x="",y="Latency (Mbps)",title="Mean Latency for different Quarter")
+      }
+    }
+    else{
+      if(type == "Download"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_dl_mbps_wt),y=mean_dl_mbps_wt,fill=mean_dl_mbps_wt)) +
+          scale_fill_continuous(low = "darkblue", high = "green")+
+          labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter")
+      } else if(type == "Upload"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_ul_mbps_wt),y=mean_ul_mbps_wt,fill=mean_ul_mbps_wt)) +
+          scale_fill_continuous(low = "darkblue", high = "green")+
+          labs(x="",y="Mean UL Speed (Mbps)",title="Mean UL Speed for different Quarter")
+      } else if(type == "Latency"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_lat_ms_wt),y=mean_lat_ms_wt,fill=mean_lat_ms_wt)) +
+          scale_fill_continuous(low = "darkblue", high = "green")+
+          labs(x="",y="Latency (Mbps)",title="Mean Latency for different Quarter")
+      }
+    }
+  }
+  
+  else{
+    if(quarter == "2020 Q1"){
+      rankdf <- county_stats_q1_20
+    } else if(quarter == "Q2"){
+      rankdf <- county_stats_q2_20
+    } else if(quarter == "Q3"){
+      rankdf <- county_stats_q3_20
+    } else if(quarter == "Q4"){
+      rankdf <- county_stats_q4_20
+    } else if(quarter == "2021 Q1"){
+      rankdf <- county_stats_q1_21
+    }
+    
+    if(highlight==TRUE){
+      rankdf <- rankdf[rankdf['nam']==state_name,] %>% mutate( ToHighlight = ifelse( laa == county_name, "yes", "no" ))
+      if(type == "Download"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_dl_mbps_wt),y=mean_dl_mbps_wt,fill=ToHighlight)) +
+          scale_fill_manual( values = c( "yes"="tomato", "no"="gray" ), guide = FALSE )+
+          labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter")
+      } else if(type == "Upload"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_ul_mbps_wt),y=mean_ul_mbps_wt,fill=ToHighlight)) +
+          scale_fill_manual( values = c( "yes"="tomato", "no"="gray" ), guide = FALSE )+
+          labs(x="",y="Mean UL Speed (Mbps)",title="Mean UL Speed for different Quarter")
+      } else if(type == "Latency"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_lat_ms_wt),y=mean_lat_ms_wt,fill=ToHighlight)) +
+          scale_fill_manual( values = c( "yes"="tomato", "no"="gray" ), guide = FALSE )+
+          labs(x="",y="Latency (Mbps)",title="Mean Latency for different Quarter")
+      }
+    }
+    else{
+      rankdf <- rankdf[rankdf['nam']==state_name,]
+      if(type == "Download"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_dl_mbps_wt),y=mean_dl_mbps_wt,fill=mean_dl_mbps_wt)) +
+          scale_fill_continuous(low = "darkblue", high = "green")+
+          labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter")
+      } else if(type == "Upload"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_ul_mbps_wt),y=mean_ul_mbps_wt,fill=mean_ul_mbps_wt)) +
+          scale_fill_continuous(low = "darkblue", high = "green")+
+          labs(x="",y="Mean UL Speed (Mbps)",title="Mean UL Speed for different Quarter")
+      } else if(type == "Latency"){
+        rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_lat_ms_wt),y=mean_lat_ms_wt,fill=mean_lat_ms_wt)) +
+          scale_fill_continuous(low = "darkblue", high = "green")+
+          labs(x="",y="Latency (Mbps)",title="Mean Latency for different Quarter")
+      }
+    }
+  }
+  rankplot <- rankplot +
+    geom_bar(position="dodge2",stat="identity") + 
+    theme(axis.text.x=element_text(angle=90, hjust=1)) +
+    coord_flip()
+  return(rankplot)
+}
+
+rankp<-rankFunction("KEDAH","KOTA SETAR","Q2","Download","County",TRUE)
+
+rank <- mobile_q1_20 %>% mutate( ToHighlight = ifelse( nam == "JOHOR", "yes", "no" ) )
 # plot DL Speed stats by states
-ggplot(states_stats, aes(x=nam,y=mean_dl_mbps_wt,fill=Quarter)) + 
+ggplot(rank, aes(x=reorder(nam, avg_d_kbps),y=avg_d_kbps,fill=avg_d_kbps)) +
+  scale_fill_continuous(low = "darkblue", high = "green")+
   geom_bar(position="dodge2",stat="identity") + 
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter")
-  #coord_flip()
+  labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter")+
+  coord_flip()
 
 #######################################################################
 
 # stats by county '20 q1
 county_stats_q1_20 <- mobile_q1_20 %>%
   st_set_geometry(NULL) %>%
-  group_by(laa) %>%
+  group_by(nam,laa) %>%
   summarise(mean_dl_mbps_wt = weighted.mean(avg_d_kbps, tests) / 1000,
             mean_ul_mbps_wt = weighted.mean(avg_u_kbps, tests) / 1000,
             mean_lat_ms_wt = weighted.mean(avg_lat_ms, tests),
@@ -118,7 +224,7 @@ county_stats_q1_20 <- mobile_q1_20 %>%
 # stats by county '20 q2
 county_stats_q2_20 <- mobile_q2_20 %>%
   st_set_geometry(NULL) %>%
-  group_by(laa) %>%
+  group_by(nam,laa) %>%
   summarise(mean_dl_mbps_wt = weighted.mean(avg_d_kbps, tests) / 1000,
             mean_ul_mbps_wt = weighted.mean(avg_u_kbps, tests) / 1000,
             mean_lat_ms_wt = weighted.mean(avg_lat_ms, tests),
@@ -127,7 +233,7 @@ county_stats_q2_20 <- mobile_q2_20 %>%
 # stats by county '20 q3
 county_stats_q3_20 <- mobile_q3_20 %>%
   st_set_geometry(NULL) %>%
-  group_by(laa) %>%
+  group_by(nam,laa) %>%
   summarise(mean_dl_mbps_wt = weighted.mean(avg_d_kbps, tests) / 1000,
             mean_ul_mbps_wt = weighted.mean(avg_u_kbps, tests) / 1000,
             mean_lat_ms_wt = weighted.mean(avg_lat_ms, tests),
@@ -136,7 +242,7 @@ county_stats_q3_20 <- mobile_q3_20 %>%
 # stats by county '20 q4
 county_stats_q4_20 <- mobile_q4_20 %>%
   st_set_geometry(NULL) %>%
-  group_by(laa) %>%
+  group_by(nam,laa) %>%
   summarise(mean_dl_mbps_wt = weighted.mean(avg_d_kbps, tests) / 1000,
             mean_ul_mbps_wt = weighted.mean(avg_u_kbps, tests) / 1000,
             mean_lat_ms_wt = weighted.mean(avg_lat_ms, tests),
@@ -145,7 +251,7 @@ county_stats_q4_20 <- mobile_q4_20 %>%
 # stats by county '21 q1
 county_stats_q1_21 <- mobile_q1_21 %>%
   st_set_geometry(NULL) %>%
-  group_by(laa) %>%
+  group_by(nam,laa) %>%
   summarise(mean_dl_mbps_wt = weighted.mean(avg_d_kbps, tests) / 1000,
             mean_ul_mbps_wt = weighted.mean(avg_u_kbps, tests) / 1000,
             mean_lat_ms_wt = weighted.mean(avg_lat_ms, tests),
@@ -168,8 +274,15 @@ county_stats %>%
   ggplot(aes(x=laa,y=mean_dl_mbps_wt,fill=Quarter)) + 
   geom_bar(position="dodge2",stat="identity") + 
   #theme(axis.text.x=element_text(angle=270, hjust=1),axis.text.y=element_text(angle=180, hjust=1)) +
-  labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter")
+  labs(x="",y="Mean DL Speed (Mbps)",title="Mean DL Speed for different Quarter") + scale_fill_manual( values = c("grey","grey","tomato","grey","grey"), guide = FALSE )
   #coord_flip()
+
+
+library("reshape2")
+mdf <- melt(states_stats[c('nam','Quarter','mean_dl_mbps_wt')], id.vars=c("nam","Quarter"), value.name="value")
+ggplot(data=mdf, aes(x=Quarter, y=value, group = nam, colour = nam)) +
+  geom_line() +
+  geom_point( size=4, shape=21, fill="white")
 
 #######################################################################
 
