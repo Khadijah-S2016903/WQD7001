@@ -15,6 +15,9 @@ library(reshape2)
 library(highcharter)
 library(plotly)
 library(tools)
+library(rintrojs) # Baha - added 16/6/2021 for user guide
+
+
 
 # Baha - modified 7/6/2021 - comment out read_sf, load input from local database
 # mobile_q1_20 <- read_sf("Joined_2020_q1/mobile_q1_2020_join.shp")
@@ -178,36 +181,36 @@ county_state <- mobile_q1_20 %>%
 
 # Baha - added 11/6/2021 - helper function to calculate ave, max, min in map
 national_stat <- function(quarter,type){
-    if(quarter=="2020 Q1"){
-      n_stats <- states_stats_q1_20
-    } else if(quarter=="Q2"){
-      n_stats <- states_stats_q2_20
-    } else if(quarter=="Q3"){
-      n_stats <- states_stats_q3_20
-    } else if(quarter=="Q4"){
-      n_stats <- states_stats_q4_20
-    } else if(quarter=="2021 Q1"){
-      n_stats <- states_stats_q1_21
-    }
-
-    if(type == "Download"){
-      national_stat <- n_stats %>%
-        summarise(ave_n = round(mean(mean_dl_mbps_wt),digits=2),
-                  min_n = round(min(mean_dl_mbps_wt),digits=2),
-                  max_n = round(max(mean_dl_mbps_wt),digits=2))
-    } else if(type == "Upload"){
-      national_stat <- n_stats %>%
-        summarise(ave_n = round(mean(mean_ul_mbps_wt),digits=2),
-                  min_n = round(min(mean_ul_mbps_wt),digits=2),
-                  max_n = round(max(mean_ul_mbps_wt),digits=2))
-    } else if(type == "Latency"){
-      national_stat <- n_stats %>%
-        summarise(ave_n = round(mean(mean_lat_ms_wt),digits=2),
-                  min_n = round(max(mean_lat_ms_wt),digits=2),
-                  max_n = round(min(mean_lat_ms_wt),digits=2))
-    }
-
-    return(national_stat)
+  if(quarter=="2020 Q1"){
+    n_stats <- states_stats_q1_20
+  } else if(quarter=="Q2"){
+    n_stats <- states_stats_q2_20
+  } else if(quarter=="Q3"){
+    n_stats <- states_stats_q3_20
+  } else if(quarter=="Q4"){
+    n_stats <- states_stats_q4_20
+  } else if(quarter=="2021 Q1"){
+    n_stats <- states_stats_q1_21
+  }
+  
+  if(type == "Download"){
+    national_stat <- n_stats %>%
+      summarise(ave_n = round(mean(mean_dl_mbps_wt),digits=2),
+                min_n = round(min(mean_dl_mbps_wt),digits=2),
+                max_n = round(max(mean_dl_mbps_wt),digits=2))
+  } else if(type == "Upload"){
+    national_stat <- n_stats %>%
+      summarise(ave_n = round(mean(mean_ul_mbps_wt),digits=2),
+                min_n = round(min(mean_ul_mbps_wt),digits=2),
+                max_n = round(max(mean_ul_mbps_wt),digits=2))
+  } else if(type == "Latency"){
+    national_stat <- n_stats %>%
+      summarise(ave_n = round(mean(mean_lat_ms_wt),digits=2),
+                min_n = round(max(mean_lat_ms_wt),digits=2),
+                max_n = round(min(mean_lat_ms_wt),digits=2))
+  }
+  
+  return(national_stat)
 }
 
 
@@ -382,13 +385,15 @@ rankFunction <- function(state_name,county_name,quarter,type,lvl,highlight){
         rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_dl_mbps_wt),y=mean_dl_mbps_wt,fill=mean_dl_mbps_wt)) +
           scale_fill_viridis()+
           labs(x="",y="Mean DL Speed (Mbps)",title=paste("Mean Download Speed for All States",quarter_name))+ 
-          labs(fill = "Latency (ms)")+
+          # Baha modified 16/6/2021 - correction of label
+          labs(fill = "DL Speed (Mbps)")+
           theme(plot.title = element_text(hjust = 0.5))
       } else if(type == "Upload"){
         rankplot <- ggplot(rankdf, aes(x=reorder(nam, mean_ul_mbps_wt),y=mean_ul_mbps_wt,fill=mean_ul_mbps_wt)) +
           scale_fill_viridis()+
           labs(x="",y="Mean UL Speed (Mbps)",title=paste("Mean Upload Speed for All States",quarter_name))+ 
-          labs(fill = "Latency (ms)")+
+          # Baha modified 16/6/2021 - correction of label
+          labs(fill = "UL Speed (Mbps)")+
           theme(plot.title = element_text(hjust = 0.5))
       } else if(type == "Latency"){
         rankplot <- ggplot(rankdf, aes(x=reorder(nam, -mean_lat_ms_wt),y=mean_lat_ms_wt,fill=mean_lat_ms_wt)) +
@@ -446,13 +451,15 @@ rankFunction <- function(state_name,county_name,quarter,type,lvl,highlight){
         rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_dl_mbps_wt),y=mean_dl_mbps_wt,fill=mean_dl_mbps_wt)) +
           scale_fill_viridis()+
           labs(x="",y="Mean DL Speed (Mbps)",title=paste("Mean Download Speed for",toTitleCase(state_name),quarter_name))+ 
-          labs(fill = "Latency (ms)")+
+          # Baha modified 16/6/2021 - correction of label
+          labs(fill = "DL Speed (Mbps)")+
           theme(plot.title = element_text(hjust = 0.5))
       } else if(type == "Upload"){
         rankplot <- ggplot(rankdf, aes(x=reorder(laa, mean_ul_mbps_wt),y=mean_ul_mbps_wt,fill=mean_ul_mbps_wt)) +
           scale_fill_viridis()+
           labs(x="",y="Mean UL Speed (Mbps)",title=paste("Mean Upload Speed for",toTitleCase(state_name),quarter_name))+ 
-          labs(fill = "Latency (ms)")+
+          # Baha modified 16/6/2021 - correction of label
+          labs(fill = "UL Speed (Mbps)")+
           theme(plot.title = element_text(hjust = 0.5))
       } else{
         rankplot <- ggplot(rankdf, aes(x=reorder(laa, -mean_lat_ms_wt),y=mean_lat_ms_wt,fill=mean_lat_ms_wt)) +
@@ -551,111 +558,202 @@ line_plot_function <- function(lvl, list1, state, type){
 # Define UI for app that draws a histogram ----
 ui <- bootstrapPage(
   theme = shinytheme("sandstone"),
+  introjsUI(),  # Baha modified 16/6/2021 - for user guide
   navbarPage(
     "Mobile Network Analysis",
     
-    tabPanel("Map",
+    tabPanel(#introBox(
+                      "Map",
+                      # data.step = 1,
+                      # data.intro = "This tab contains Geolocation mapping of mobile network performance tiles in State Level or District Level."
+                      # ),
              sidebarPanel(width = 2,
                           # Baha - modified 7/6/2021 - add input to select map level
-                          radioGroupButtons("level_select1", "Map View:",   
-                                      choices = c("State", "District"), 
-                                      selected = c("District"),
-                                      justified = TRUE),
+                          # introBox(
+                          radioGroupButtons("level_select1","Map View:",choices=c("State","District"),selected=c("State"),justified=TRUE),
+                          # data.step = 2,
+                          # data.intro = "Choose your Map View of interest."
+                          # ),
+                          # introBox(
                           pickerInput("state_select1", "State:",   
                                       choices = names(county_state), 
                                       selected = "KEDAH",
                                       options = list(
                                         `live-search` = TRUE)),
+                          # data.step = 3,
+                          # data.intro = "Select your chosen State of interest from the drop down list."
+                          # ),
+                          # introBox(
                           pickerInput("county_select1", "District:",   
                                       choices = pull(county_state[['KEDAH']],'laa'), 
                                       selected = "BALING",
                                       options = list(
                                         `live-search` = TRUE)),
+                          # data.step = 4,
+                          # data.intro = "Select your chosen District of interest from the drop down list."
+                          # ),
+                          # introBox(
                           pickerInput("type_select1", "Type:",   
                                       choices = c("Download", "Upload", "Latency"), 
                                       selected = c("Download")),
+                          # data.step = 5,
+                          # data.intro = "Select your chosen Performance Metric of interest (Download, Upload, or Latency) from the drop down list."
+                          # ),
+                          # introBox(
                           shinyWidgets::sliderTextInput("quarter_select1", 
                                                         label = "Quarter:", 
                                                         choices = c("2020 Q1", "Q2", "Q3", "Q4", "2021 Q1"),
-                                                        grid = TRUE)
+                                                        grid = TRUE),
+                          # data.step = 6,
+                          # data.intro = "Slide to your chosen quarter of interest."
+                          # ),
+                          # introBox(
+                          #   actionButton("help","User Guide"),
+                          #   data.step = 9,
+                          #   data.intro = "This is the end of Map Guide."
+                          # ),
              ),
              # Baha - modified 11/6/2021 - add panel to show ave, min, max values
              mainPanel(width = 10,
                        div(class="inner",tags$head(includeCSS("styles1.css")),
-                       leafletOutput("mapplot", height= 700),
-                      
-                       absolutePanel(id = "controls", class = "panel panel-default",
-                                    top = 200, left = 350, width = 250, fixed=TRUE,
-                                    draggable = TRUE, height = "auto",
-                                    
-                                    span(tags$i(h6("National level statistics are calculated using weighted mean, by averaging each tile values to the number of conducted tests.")), style="color:#045a8d"),
-                                    h2(textOutput("mean_national"), align = "right"),
-                                    h6(textOutput("mean_national_desc"), align = "right"),
-                                    h4(textOutput("max_national"), align = "right"),
-                                    h6(textOutput("max_national_desc"), align = "right"),
-                                    h4(textOutput("min_national"), align = "right"),
-                                    h6(textOutput("min_national_desc"), align = "right"),
-                                    h2(textOutput("target_state"), align = "right"),
-                                    h6(textOutput("target_state_desc"), align = "right"),
-                                    h4(textOutput("mean_target_state"), align = "right"),
-                                    h6(textOutput("mean_target_state_desc"), align = "right"),
-                                    h4(textOutput("mean_target_district"), align = "right"),
-                                    h6(textOutput("mean_target_district_desc"), align = "right"),
-                                    ),
-
+                           # introBox(
+                           leafletOutput("mapplot", height= 700),
+                           # data.step = 7,
+                           # data.intro = "This map shows your chosen performance metric of your selection in tiles. Hover, Zoom, or Click on the tiles to show the details."
+                           # ),
+                           
+                           absolutePanel(id = "controls", class = "panel panel-default",
+                                         top = 200, left = 350, width = 250, fixed=TRUE,
+                                         draggable = TRUE, height = "auto",
+                                         
+                                         # introBox(
+                                         span(tags$i(h6("National level statistics are calculated using weighted mean, by averaging each tile values to the number of conducted tests.")), style="color:#045a8d"),
+                                         h2(textOutput("mean_national"), align = "right"),
+                                         h6(textOutput("mean_national_desc"), align = "right"),
+                                         h4(textOutput("max_national"), align = "right"),
+                                         h6(textOutput("max_national_desc"), align = "right"),
+                                         h4(textOutput("min_national"), align = "right"),
+                                         h6(textOutput("min_national_desc"), align = "right"),
+                                         h2(textOutput("target_state"), align = "right"),
+                                         h6(textOutput("target_state_desc"), align = "right"),
+                                         h4(textOutput("mean_target_state"), align = "right"),
+                                         h6(textOutput("mean_target_state_desc"), align = "right"),
+                                         h4(textOutput("mean_target_district"), align = "right"),
+                                         h6(textOutput("mean_target_district_desc"), align = "right"),
+                                         # data.step = 8,
+                                         # data.intro = "This panel shows National statistics for Mean, Maximum and Minimum values by states. It also shows the rank and average values of your selection."
+                                         # ),
+                           ),
+                           
                        ),
-            )
+             )
     ),
-    tabPanel("Ranking",
+    tabPanel(#introBox(
+              "Ranking",
+            #   data.step = 1,
+            #   data.intro = "This tab contains the ranking of mobile network performance in State Level or District Level."
+            # ),
              sidebarPanel(width = 2,
+                          # introBox(
                           radioGroupButtons("level_select2", "Level:",   
                                             choices = c("State", "District"), 
                                             selected = c("District"),
                                             justified = TRUE),
+                          # data.step = 2,
+                          # data.intro = "Choose your output Level of interest."
+                          # ),
+                          # introBox(
                           pickerInput("state_select2", "State:",   
                                       choices = names(county_state), 
                                       selected = "KEDAH",
                                       options = list(
                                         `live-search` = TRUE)),
+                          # data.step = 3,
+                          # data.intro = "Select your chosen State of interest from the drop down list."
+                          # ),
+                          # introBox(
                           pickerInput("county_select2", "District:",   
                                       choices = pull(county_state[['KEDAH']],'laa'), 
                                       selected = "BALING",
                                       options = list(
                                         `live-search` = TRUE)),
+                          # data.step = 4,
+                          # data.intro = "Select your chosen District of interest from the drop down list. If you have chosen State Level before, this list will be invalid."
+                          # ),
+                          # introBox(
                           pickerInput("type_select2", "Type:",   
                                       choices = c("Download", "Upload", "Latency"), 
                                       selected = c("Download")),
+                          # data.step = 5,
+                          # data.intro = "Select your chosen Performance Metric of interest (Download, Upload, or Latency) from the drop down list."
+                          # ),
+                          # introBox(
                           shinyWidgets::sliderTextInput("quarter_select2", 
                                                         label = "Quarter:", 
                                                         choices = c("2020 Q1", "Q2", "Q3", "Q4", "2021 Q1"),
+                                                        grid = TRUE,
                                                         # Baha - modified 11/6/2021 - add animation
                                                         animate=animationOptions(interval = 3000, loop = FALSE)),
+                          # data.step = 6,
+                          # data.intro = "Slide to your chosen quarter of interest. Click Play if you want to animate changes until end of slide bar."
+                          # ),
+                          # introBox(
                           materialSwitch("highlight2",
-                            label = "Highlight selection", 
-                            value = TRUE, 
-                            right = TRUE,
-                            status = "success"
-                          )
+                                         label = "Highlight selection", 
+                                         value = TRUE, 
+                                         right = TRUE,
+                                         status = "success"
+                          ),
+                          # data.step = 7,
+                          # data.intro = "Choose highlight if you want to highlight your selection in plot."
+                          # ),
+                          # introBox(
+                          #   actionButton("help","User Guide"),
+                          #   data.step = 9,
+                          #   data.intro = "This is the end of Ranking Guide."
+                          # ),
              ),
              mainPanel(width = 10,
+                       # introBox(
                        plotlyOutput("ranking_plot", height = "600px")
+                       # ,
+                       # data.step = 8,
+                       # data.intro = "This bar chart shows the ranking of your selection, with the best performers stays at the top of the chart. Hover to the bars to show details."
+                       # ),
              )         
     ),
     
-    tabPanel("Trend",
+    tabPanel(#introBox(
+              "Trend",
+              # data.step = 1,
+              # data.intro = "This tab contains the trend of mobile network performance in State Level or District Level."
+              # ),
              sidebarPanel(width = 2,
+                          # introBox(
                           radioGroupButtons("level_select3", "Level:",   
                                             choices = c("State", "District"), 
                                             selected = c("District"),
                                             justified = TRUE),
+                          # data.step = 2,
+                          # data.intro = "Choose your output Level of interest."
+                          # ),
+                          # introBox(
                           pickerInput("state_select3", "State:",   
                                       choices = names(county_state), 
                                       selected = "KEDAH",
                                       options = list(
                                         `live-search` = TRUE)),
+                          # data.step = 3,
+                          # data.intro = "Select your chosen State of interest from the drop down list. If you have chosen State Level before, this selection will be invalid."
+                          # ),
+                          # introBox(
                           pickerInput("type_select3", "Type:",   
                                       choices = c("Download", "Upload", "Latency"), 
-                                      selected = c("Download")),                        
+                                      selected = c("Download")),
+                          # data.step = 4,
+                          # data.intro = "Select your chosen Performance Metric of interest (Download, Upload, or Latency) from the drop down list."
+                          # ),
+                          # introBox(
                           pickerInput(
                             inputId = "line_select3", label = "Show :",
                             choices = pull(county_state[['KEDAH']],'laa'), 
@@ -663,43 +761,91 @@ ui <- bootstrapPage(
                                            `count-selected-text` = "{0}/{1} Selected"),
                             multiple = TRUE
                           )
+                          # ,
+                          # data.step = 5,
+                          # data.intro = "Select your chosen list of interest to show in the plot."
+                          # ),
+                          # introBox(
+                          #   actionButton("help","User Guide"),
+                          #   data.step = 7,
+                          #   data.intro = "This is the end of Trend Guide."
+                          # ),
              ),
              mainPanel(width = 10,
+                       # introBox(
                        highchartOutput("line_plot", width = "100%", height = "100%")
+                       # ,
+                       # data.step = 6,
+                       # data.intro = "This line chart shows the trend of your selection from Q1 2020 to Q1 2021. Hover to the lines to show details."
+                       # ),
              )  
     ),
     
     # Baha - added 13/6/2021 - added data search tab
-    tabPanel("Data Search",
+    tabPanel(introBox(
+              "Data Search",
+              data.step = 1,
+              data.intro = "This tab contains details of performance metrics in State Level or District Level."
+              ),
+             introBox(
              radioGroupButtons("datatable_select", "Select Data to view:",   
                                choices = c("State", "District"), 
                                selected = c("State")),
-
+             data.step = 2,
+             data.intro = "Choose your output Level of interest."
+             ),
+             introBox(
              DT::dataTableOutput("data_table")
+             ,
+             data.step = 3,
+             data.intro = "Use Search to filter the table. Click the column name to sort the table."
+             ),
+             introBox(
+                 actionButton("help","User Guide"),
+                 data.step = 4,
+                 data.intro = "This is the end of Data Search Guide."
+              ),
+             
     ),
     
     navbarMenu("Info",
                tabPanel("User Manual",
-                        # Baha - modified 13/6/2021 - add information in user manual tab
-                        tags$div(tags$img(src="Word_Cloud.png",width="50%",height="50%"),align="center"),
-                        tags$br(),tags$br(),tags$b("Mobile Network Performance Speed Coverage Map"),
-                        " is an interactive network speed check service check service which 
-                        providing network speed comparison (ranking) among places, displaying 
-                        speed and coverage on specified location, as well as quarterly network 
-                        speed change trend throughout a year, based on user input.",tags$br(),tags$br(),
-                        tags$div(tags$b("____________________________________________________________________________"),align="center"),
-                        tags$br(),tags$br(),tags$div(tags$img(src="Quarterly_Trend.png",width="35%",height="35%"),align="left"),tags$br(),tags$br(),
-                        tags$div(tags$b("____________________________________________________________________________"),align="center"),
-                        tags$br(),tags$br(),tags$div(tags$img(src="Geo_Ranking.png",width="35%",height="35%"),align="right"),tags$br(),tags$br(),
-                        tags$div(tags$b("____________________________________________________________________________"),align="center"),
-                        tags$br(),tags$br(),tags$div(tags$img(src="Connectivity_Map.png",width="35%",height="35%"),align="left"),tags$br(),tags$br(),
-                        tags$div(tags$b("____________________________________________________________________________"),align="center"),
-                        tags$br(),tags$br(),tags$div(tags$img(src="Speed_Info.png",width="35%",height="35%"),align="right"),tags$br(),tags$br(),
-                        tags$div(tags$b("____________________________________________________________________________"),align="center"),
-                        tags$br(),tags$br(),
-                        ),
+                        fluidPage(
+                          # Baha modified 16/6/2021 - add information in user manual tab
+                          tags$div(tags$img(src="Word_Cloud.png",width="35%",height="35%"),align="center"),
+                          tags$br(),tags$br(),
+                          tags$div(tags$img(src="Connectivity_Map.png",width="7%",height="7%"),
+                                   tags$img(src="Geo_Ranking.png",width="7%",height="7%"),
+                                   tags$img(src="Quarterly_Trend.png",width="7%",height="7%"),
+                                   tags$img(src="Speed_Info.png",width="7%",height="7%"),
+                                   align="center"),tags$br(),tags$br(),
+                          tags$div(tags$b("____________________________________________________________________________"),align="center"),
+                          tags$br(),tags$br(),
+                          tags$div("Play the ",tags$b("VIDEO")," below for manual instructions.",align="center"),
+                          
+                          tags$br(),tags$br(),tags$div(tags$img(src="Connectivity_Map.png",width="20%",height="20%"),
+                                                       tags$video(src="MapTabVideo.mp4",type="video/mp4",controls="controls",width="20%",height="20%"),
+                                                       #HTML('<iframe width="20%" height="20%" src="DataSearchTabVideo.mp4" frameborder="0" allow="accelerometer; autostart="false"; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'),
+                                                       align="center"),
+                          tags$br(),tags$br(),tags$div(tags$img(src="Geo_Ranking.png",width="20%",height="20%"),
+                                                       tags$video(src="RankingTabVideo.mp4",type="video/mp4",controls="controls",width="20%",height="20%"),
+                                                       #HTML('<iframe width="20%" height="20%" src="MapTabVideo.mp4" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'),
+                                                       align="center"),
+                          tags$br(),tags$br(),tags$div(tags$img(src="Quarterly_Trend.png",width="20%",height="20%"),
+                                                       tags$video(src="TrendTabVideo.mp4",type="video/mp4",controls="controls",width="20%",height="20%"),
+                                                       #HTML('<iframe width="20%" height="20%" src="MapTabVideo.mp4" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'),
+                                                       align="center"),
+                          tags$br(),tags$br(),tags$div(tags$img(src="Speed_Info.png",width="20%",height="20%"),
+                                                       tags$video(src="DataSearchTabVideo.mp4",type="video/mp4",controls="controls",width="20%",height="20%"),
+                                                       #HTML('<iframe width="20%" height="20%" src="DataSearchTabVideo.mp4" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'),
+                                                       align="center"),
+                          tags$br(),tags$br(),
+                          tags$div(tags$b("____________________________________________________________________________"),align="center"),
+                          tags$br(),tags$br(),
+                        )
+               ),
                tabPanel("About",
-                        # Baha - modified 13/6/2021 - add information in about tab
+                        # Baha modified 16/6/2021 - add information in about tab
                         tags$div(tags$img(src="Picture_About.png",width="80%",height="80%"),align="center"),
                         tags$br(),tags$br(),
                         tags$div(tags$b("____________________________________________________________________________"),align="center"),
@@ -708,13 +854,13 @@ ui <- bootstrapPage(
                         tags$br(),tags$br(),
                         tags$div(tags$b("____________________________________________________________________________"),align="center"),
                         tags$br(),tags$br(),
-                        tags$div(tags$img(src="Data.png",width="10%",height="10%"),align="center"),tags$br(),
-                        tags$div(tags$a(href="https://github.com/teamookla/ookla-open-data",tags$img(src="ookla-for-good.svg",width="10%",height="10%")),HTML('&emsp;'),HTML('&emsp;'),HTML('&emsp;'),
-                        tags$a(href="https://earthworks.stanford.edu/catalog/stanford-zd362bc5680", tags$img(src="stanford-libraries.svg",width="10%",height="10%")),align="center"),
+                        tags$div(tags$img(src="Logo_Data.jpg",width="10%",height="10%"),align="center"),tags$br(),
+                        tags$div(tags$a(href="https://github.com/teamookla/ookla-open-data",target="_blank",tags$img(src="ookla-for-good.svg",width="10%",height="10%")),HTML('&emsp;'),HTML('&emsp;'),HTML('&emsp;'),
+                                 tags$a(href="https://earthworks.stanford.edu/catalog/stanford-zd362bc5680",target="_blank",tags$img(src="stanford-libraries.svg",width="10%",height="10%")),align="center"),
                         tags$br(),tags$br(),
                         tags$div(tags$b("____________________________________________________________________________"),align="center"),
                         tags$br(),tags$br(),
-                        )
+               )
                
                
     )
@@ -803,7 +949,7 @@ server <- function(input, output, session) {
     x <- input$quarter_select2
     updateSliderTextInput(session, "quarter_select1", selected = x)
   })
-
+  
   
   # Baha - modified 7/6/2021 - additional input to new mapfunction
   output$mapplot <- renderLeaflet({
@@ -887,7 +1033,7 @@ server <- function(input, output, session) {
     }else if(input$datatable_select == "District"){
       data <- county_stats
     }
-    ))
+  ))
   
   #PlotHeight = reactive(
   #  return(20*bar_count(input$level_select2, input$state_select2))
@@ -903,6 +1049,15 @@ server <- function(input, output, session) {
     validate(need( length(input$line_select3) > 0, "Select at least 1 State/District to see plot"))
     line_plot_function(input$level_select3, input$line_select3, input$state_select3, input$type_select3)
   })
+  
+  # Baha - added 14/6/2021 for user guide Data Search Tab
+  observeEvent(input$help,
+               introjs(session, options = list("nextLabel"="Next",
+                                               "prevLabel"="Previous"
+                                               #"skipLabel"="Done"),
+               ),
+               events = list("oncomplete"=I('alert("End of user guide for Data Search Tab.")')))
+  )
 }
 
 shinyApp(ui = ui, server = server)
